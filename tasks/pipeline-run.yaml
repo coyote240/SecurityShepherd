@@ -1,0 +1,44 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: security-shepherd-build-run
+spec:
+  pipelineRef:
+    name: security-shepherd-build
+  workspaces:
+    - name: shared-data
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+  params:
+    - name: repo-url
+      value: https://github.com/OWASP/SecurityShepherd.git
+    - name: branch-name
+      value: dev
+    - name: image_tomcat
+      value: owasp/security-shepherd
+    - name: container_tomcat
+      value: secshep_tomcat
+    - name: tomcat_docker_version
+      value: 8.5.51-jdk8-openjdk
+    - name: mysql_user
+      value: root
+    - name: mysql_pass
+      value: CowSaysMoo
+    - name: container_mysql
+      value: secshep_mysql
+    - name: container_mongo
+      value: secshep_mongo
+    - name: tls_keystore_file
+      value: shepherdKeystore.p12
+    - name: tls_keystore_pass
+      value: CowSaysMoo
+    - name: alias
+      value: tomcat
+    - name: https_port
+      value: "443"
+

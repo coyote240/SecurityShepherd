@@ -32,43 +32,29 @@ spec:
       mountPath: /SecurityShepherd
   steps:
     - name: build-environment
-      image: ubuntu
+      image: maven:3.6.3-openjdk-8
       script: |
         mvn -Pdocker clean install -DskipTests
       env:
         - name: "IMAGE_TOMCAT"
           value: "$(params.image_tomcat)"
         - name: "CONTAINER_TOMCAT"
-          value: "$(params.container_comcat)"
----
-apiVersion: tektop.dev/v1beta1
-kind: Taskrun
-metadata:
-  name: shepherd-build-image-run
-spec:
-  taskRef:
-    name: shepherd-build-image
-  params:
-    - name: image_tomcat
-      value: owasp/security-shepherd
-    - name: container_tomcat
-      value: secshep_tomcat
-    - name: tomcat_docker_version
-      value: 8.5.51-jdk8-openjdk
-    - name: mysql_user
-      value: root
-    - name: mysql_pass
-      value: CowSaysMoo
-    - name: container_mysql
-      value: secshep_mysql
-    - name: container_mongo
-      value: secshep_mongo
-    - name: tls_keystore_file
-      value: shepherdKeystore.p12
-    - name: tls_keystore_pass
-      value: CowSaysMoo
-    - name: alias
-      value: tomcat
-    - name: https_port
-      value: 443
-
+          value: "$(params.container_tomcat)"
+        - name: "TOMCAT_DOCKER_VERSION"
+          value: "$(params.tomcat_docker_version)"
+        - name: "MYSQL_USER"
+          value: "$(params.mysql_user)"
+        - name: "MYSQL_PASS"
+          value: "$(params.mysql_pass)"
+        - name: "CONTAINER_MYSQL"
+          value: "$(params.container_mysql)"
+        - name: "CONTAINER_MONGO"
+          value: "$(params.container_mongo)"
+        - name: "TLS_KEYSTORE_FILE"
+          value: "$(params.tls_keystore_file)"
+        - name: "TLS_KEYSTORE_PASS"
+          value: "$(params.tls_keystore_pass)"
+        - name: "ALIAS"
+          value: "$(params.alias)"
+        - name: "HTTPS_PORT"
+          value: "$(params.https_port)"

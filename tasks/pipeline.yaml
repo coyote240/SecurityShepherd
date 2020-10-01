@@ -3,6 +3,35 @@ kind: Pipeline
 metadata:
   name: security-shepherd-build
 spec:
+  params:
+    - name: repo-url
+      type: string
+    - name: branch-name
+      type: string
+    - name: image_tomcat
+      type: string
+    - name: container_tomcat
+      type: string
+    - name: tomcat_docker_version
+      type: string
+    - name: mysql_user
+      type: string
+    - name: mysql_pass
+      type: string
+    - name: container_mysql
+      type: string
+    - name: container_mongo
+      type: string
+    - name: tls_keystore_file
+      type: string
+    - name: tls_keystore_pass
+      type: string
+    - name: alias
+      type: string
+    - name: https_port
+      type: string
+  workspaces:
+    - name: shared-data
   tasks:
     - name: fetch-repo
       taskRef:
@@ -15,6 +44,19 @@ spec:
           value: $(params.repo-url)
         - name: revision
           value: $(params.branch-name)
+    - name: notify-clone
+      taskRef:
+        name: notify-slack
+      runAfter: ["fetch-repo"]
+      params:
+        - name: channel
+          value: "#github"
+        - name: username
+          value: Tekton
+        - name: message
+          value: Repository Cloned
+        - name: hook
+          value: https://hooks.slack.com/services/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
     - name: build-app
       taskRef:
         name: shepherd-build-app
@@ -22,37 +64,38 @@ spec:
       workspaces:
         - name: source
           workspace: shared-data
-    - name: build-image
-      taskRef:
-        name: shepherd-build-image
-      runAfter: ["build-app"]
-    - name: init-mongo
-      taskRef:
-        name: shepherd-init-mongo
-      runAfter: ["build-app"]
-    - name: init-mysql
-      taskRef:
-        name: shepherd-init-mysql
-      runAfter: ["build-app"]
----
-apiVersion: tekton.dev/v1beta1
-kind: PipelineRun
-metadata:
-  name: security-shepherd-build-run
-spec:
-  pipelineRef:
-    name: security-shepherd-build
-  workspaces:
-    - name: shared-data
-      volumeClaimTemplate:
-        spec:
-          accessModes:
-            - ReadWriteOnce
-          resources:
-            requests:
-              storage: 1Gi
-  params:
-    - name: repo-url
-      value: https://github.com/OWASP/SecurityShepherd.git
-    - branch-name:
-      value: dev
+      params:
+        - name: image_tomcat
+          value: $(params.image_tomcat)
+        - name: container_tomcat
+          value: $(params.container_tomcat)
+        - name: tomcat_docker_version
+          value: $(params.tomcat_docker_version)
+        - name: mysql_user
+          value: $(params.mysql_user)
+        - name: mysql_pass
+          value: $(params.mysql_pass)
+        - name: container_mysql
+          value: $(params.container_mysql)
+        - name: container_mongo
+          value: $(params.container_mongo)
+        - name: tls_keystore_file
+          value: $(params.tls_keystore_file)
+        - name: tls_keystore_pass
+          value: $(params.tls_keystore_pass)
+        - name: alias
+          value: $(params.alias)
+        - name: https_port
+          value: $(params.https_port)
+#     - name: build-image
+#       taskRef:
+#         name: shepherd-build-image
+#       runAfter: ["build-app"]
+#     - name: init-mongo
+#       taskRef:
+#         name: shepherd-init-mongo
+#       runAfter: ["build-app"]
+#     - name: init-mysql
+#       taskRef:
+#         name: shepherd-init-mysql
+#       runAfter: ["build-app"]
