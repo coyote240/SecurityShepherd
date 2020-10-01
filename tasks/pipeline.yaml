@@ -64,33 +64,20 @@ spec:
       workspaces:
         - name: source
           workspace: shared-data
+    - name: docker-build
+      taskRef:
+        name: docker-build
+      runAfter: ["build-app"]
+      workspaces:
+        - name: source
+          workspace: shared-data
       params:
-        - name: image_tomcat
-          value: $(params.image_tomcat)
-        - name: container_tomcat
-          value: $(params.container_tomcat)
-        - name: tomcat_docker_version
-          value: $(params.tomcat_docker_version)
-        - name: mysql_user
-          value: $(params.mysql_user)
-        - name: mysql_pass
-          value: $(params.mysql_pass)
-        - name: container_mysql
-          value: $(params.container_mysql)
-        - name: container_mongo
-          value: $(params.container_mongo)
-        - name: tls_keystore_file
-          value: $(params.tls_keystore_file)
-        - name: tls_keystore_pass
-          value: $(params.tls_keystore_pass)
-        - name: alias
-          value: $(params.alias)
-        - name: https_port
-          value: $(params.https_port)
-#     - name: build-image
-#       taskRef:
-#         name: shepherd-build-image
-#       runAfter: ["build-app"]
+        - name: image
+          value: 833023401363.dkr.ecr.us-east-1.amazonaws.com/securityshepherd
+        - name: insecure_registry
+          value: 833023401363.dkr.ecr.us-east-1.amazonaws.com
+        - name: build_extra_args
+          value: "--build-arg IMAGE_TOMCAT=$(params.image_tomcat)  --build-arg CONTAINER_TOMCAT=$(params.container_tomcat)  --build-arg TOMCAT_DOCKER_VERSION=$(params.tomcat_docker_version)  --build-arg MYSQL_USER=$(params.mysql_user)  --build-arg MYSQL_PASS=$(params.mysql_pass)  --build-arg CONTAINER_MYSQL=$(params.container_mysql)  --build-arg CONTAINER_MONGO=$(params.container_mongo)  --build-arg TLS_KEYSTORE_FILE=$(params.tls_keystore_file)  --build-arg TLS_KEYSTORE_PASS=$(params.tls_keystore_pass)  --build-arg ALIAS=$(params.alias)  --build-arg HTTPS_PORT=$(params.https_port)"
 #     - name: init-mongo
 #       taskRef:
 #         name: shepherd-init-mongo

@@ -1,0 +1,14 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: shepherd-build-app
+spec:
+  workspaces:
+    - name: source
+      description: SecurityShepherd build directory
+  steps:
+    - name: build-environment
+      image: maven:3.6.3-openjdk-8
+      script: |
+        cd source
+        mvn -Pdocker clean install -DskipTests
