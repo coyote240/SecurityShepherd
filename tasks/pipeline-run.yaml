@@ -3,6 +3,7 @@ kind: PipelineRun
 metadata:
   name: security-shepherd-build-run
 spec:
+  serviceAccountName: pipeline-builder
   pipelineRef:
     name: security-shepherd-build
   workspaces:
@@ -14,9 +15,12 @@ spec:
           resources:
             requests:
               storage: 1Gi
+    - name: secrets
+      secret:
+        secretName: aws-credentials
   params:
     - name: repo-url
-      value: https://github.com/OWASP/SecurityShepherd.git
+      value: https://github.com/coyote240/SecurityShepherd.git
     - name: branch-name
       value: dev
     - name: image_tomcat

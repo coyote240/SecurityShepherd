@@ -1,0 +1,20 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ecr-publisher
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ecr-publisher
+subjects:
+  - kind: ServiceAccount
+    name: app-builder
+roleRef:
+  kind: Role
+  name: ecr-publisher
+  apiGroup: rbac.authorization.k8s.io

@@ -32,7 +32,14 @@ spec:
       type: string
   workspaces:
     - name: shared-data
+    - name: secrets
   tasks:
+#    - name: ecr-get-password
+#      taskRef:
+#        name: aws-ecr-login
+#      workspaces:
+#        - name: secrets
+#          workspace: secrets
     - name: fetch-repo
       taskRef:
         name: git-clone
@@ -47,7 +54,8 @@ spec:
     - name: notify-clone
       taskRef:
         name: notify-slack
-      runAfter: ["fetch-repo"]
+      runAfter: 
+        - fetch-repo
       params:
         - name: channel
           value: "#github"
@@ -60,24 +68,35 @@ spec:
     - name: build-app
       taskRef:
         name: shepherd-build-app
-      runAfter: ["fetch-repo"]
+      runAfter:
+        - fetch-repo
       workspaces:
         - name: source
           workspace: shared-data
     - name: docker-build
       taskRef:
-        name: docker-build
-      runAfter: ["build-app"]
+        name: kaniko
+      runAfter: 
+        - build-app
       workspaces:
         - name: source
           workspace: shared-data
       params:
-        - name: image
-          value: 833023401363.dkr.ecr.us-east-1.amazonaws.com/securityshepherd
-        - name: insecure_registry
-          value: 833023401363.dkr.ecr.us-east-1.amazonaws.com
-        - name: build_extra_args
-          value: "--build-arg IMAGE_TOMCAT=$(params.image_tomcat)  --build-arg CONTAINER_TOMCAT=$(params.container_tomcat)  --build-arg TOMCAT_DOCKER_VERSION=$(params.tomcat_docker_version)  --build-arg MYSQL_USER=$(params.mysql_user)  --build-arg MYSQL_PASS=$(params.mysql_pass)  --build-arg CONTAINER_MYSQL=$(params.container_mysql)  --build-arg CONTAINER_MONGO=$(params.container_mongo)  --build-arg TLS_KEYSTORE_FILE=$(params.tls_keystore_file)  --build-arg TLS_KEYSTORE_PASS=$(params.tls_keystore_pass)  --build-arg ALIAS=$(params.alias)  --build-arg HTTPS_PORT=$(params.https_port)"
+        - name: IMAGE
+          value: 280296955917.dkr.ecr.us-west-2.amazonaws.com/securityshepherd
+        - name: EXTRA_ARGS
+          value: |
+            --build-arg="IMAGE_TOMCAT=$(params.image_tomcat)" \
+            --build-arg="CONTAINER_TOMCAT=$(params.container_tomcat)" \
+            --build-arg="TOMCAT_DOCKER_VERSION=$(params.tomcat_docker_version)" \
+            --build-arg="MYSQL_USER=$(params.mysql_user)" \
+            --build-arg="MYSQL_PASS=$(params.mysql_pass)" \
+            --build-arg="CONTAINER_MYSQL=$(params.container_mysql)" \
+            --build-arg="CONTAINER_MONGO=$(params.container_mongo)" \
+            --build-arg="TLS_KEYSTORE_FILE=$(params.tls_keystore_file)" \
+            --build-arg="TLS_KEYSTORE_PASS=$(params.tls_keystore_pass)" \
+            --build-arg="ALIAS=$(params.alias)" \
+            --build-arg="HTTPS_PORT=$(params.https_port)"
 #     - name: init-mongo
 #       taskRef:
 #         name: shepherd-init-mongo
