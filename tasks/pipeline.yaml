@@ -34,12 +34,6 @@ spec:
     - name: shared-data
     - name: secrets
   tasks:
-#    - name: ecr-get-password
-#      taskRef:
-#        name: aws-ecr-login
-#      workspaces:
-#        - name: secrets
-#          workspace: secrets
     - name: fetch-repo
       taskRef:
         name: git-clone
@@ -51,20 +45,6 @@ spec:
           value: $(params.repo-url)
         - name: revision
           value: $(params.branch-name)
-    - name: notify-clone
-      taskRef:
-        name: notify-slack
-      runAfter: 
-        - fetch-repo
-      params:
-        - name: channel
-          value: "#github"
-        - name: username
-          value: Tekton
-        - name: message
-          value: Repository Cloned
-        - name: hook
-          value: https://hooks.slack.com/services/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
     - name: build-app
       taskRef:
         name: shepherd-build-app

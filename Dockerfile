@@ -5,6 +5,8 @@ ENV RUN_USER tomcat
 
 RUN apt-get -qq update && apt-get install -y patch
 
+RUN echo ${CATALINA_HOME}
+
 RUN adduser --system --group ${RUN_USER} --home ${CATALINA_HOME}
 RUN chown -R ${RUN_USER}:${RUN_GROUP} $CATALINA_HOME
 USER ${RUN_USER}
